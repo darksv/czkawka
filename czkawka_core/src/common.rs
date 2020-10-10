@@ -102,7 +102,8 @@ impl Common {
         }
         true
     }
-    pub fn prettier_windows_path(path_to_change: &str) -> String {
+    #[allow(clippy::ptr_arg)]
+    pub fn prettier_windows_path(path_to_change: &String) -> String {
         path_to_change[..1].to_uppercase() + path_to_change[1..].to_lowercase().replace("\\", "/").as_str()
     }
 }
