@@ -194,10 +194,6 @@ impl DuplicateFinder {
             }
             current_folder = folders_to_check.pop().unwrap();
 
-            #[cfg(target_family = "windows")]
-            {
-                current_folder = Common::prettier_windows_path(&current_folder);
-            }
             // Read current dir, if permission are denied just go to next
             let read_dir = match fs::read_dir(&current_folder) {
                 Ok(t) => t,
@@ -268,6 +264,7 @@ impl DuplicateFinder {
                     }
                     // Checking files
                     if metadata.len() >= self.minimal_file_size {
+                        #[allow(unused_mut)] // Used is later by Windows build
                         let current_file_name = "".to_owned()
                             + &current_folder
                             + match &entry_data.file_name().into_string() {
@@ -280,6 +277,11 @@ impl DuplicateFinder {
                             if Common::regex_check(expression, &current_file_name) {
                                 continue 'dir;
                             }
+                        }
+
+                        #[cfg(target_family = "windows")]
+                        {
+                            current_file_name = Common::prettier_windows_path(&current_file_name);
                         }
 
                         // Creating new file entry
