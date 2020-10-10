@@ -36,7 +36,13 @@ impl Directories {
                 text_messages.warnings.push("Included Directory Warning: Wildcards in path are not supported, ignoring ".to_string() + directory.as_str());
                 continue;
             }
+            #[cfg(target_family = "unix")]
             if !directory.starts_with('/') {
+                text_messages.warnings.push("Included Directory Warning: Relative path are not supported, ignoring ".to_string() + directory.as_str());
+                continue;
+            }
+            #[cfg(target_family = "windows")]
+            if !(directory[..directory.len()].starts_with(":/") || !directory[..directory.len()].starts_with(":\\"))  {
                 text_messages.warnings.push("Included Directory Warning: Relative path are not supported, ignoring ".to_string() + directory.as_str());
                 continue;
             }
@@ -80,7 +86,7 @@ impl Directories {
         let mut checked_directories: Vec<String> = Vec::new();
 
         for directory in directories {
-            let directory: String = directory.trim().to_string();
+            let directory: String = directory.trim().to_string().replace("\\","/");
 
             if directory == "" {
                 continue;
@@ -93,12 +99,14 @@ impl Directories {
                 text_messages.warnings.push("Excluded Directory Warning: Wildcards in path are not supported, ignoring ".to_string() + directory.as_str());
                 continue;
             }
+            #[cfg(target_family = "unix")]
             if !directory.starts_with('/') {
                 text_messages.warnings.push("Excluded Directory Warning: Relative path are not supported, ignoring ".to_string() + directory.as_str());
                 continue;
             }
-            if !Path::new(&directory).exists() {
-                text_messages.warnings.push("Excluded Directory Warning: Provided folder path must exits, ignoring ".to_string() + directory.as_str());
+            #[cfg(target_family = "windows")]
+            if !(directory[..directory.len()].starts_with(":/") || !directory[..directory.len()].starts_with(":\\"))  {
+                text_messages.warnings.push("Excluded Directory Warning: Relative path are not supported, ignoring ".to_string() + directory.as_str());
                 continue;
             }
             if !Path::new(&directory).is_dir() {
