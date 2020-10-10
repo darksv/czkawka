@@ -42,7 +42,7 @@ impl Directories {
                 continue;
             }
             #[cfg(target_family = "windows")]
-            if !(directory[..directory.len()].starts_with(":/") || !directory[..directory.len()].starts_with(":\\"))  {
+            if !(directory[..directory.len()].starts_with(":/") || !directory[..directory.len()].starts_with(":\\")) {
                 text_messages.warnings.push("Included Directory Warning: Relative path are not supported, ignoring ".to_string() + directory.as_str());
                 continue;
             }
@@ -86,7 +86,7 @@ impl Directories {
         let mut checked_directories: Vec<String> = Vec::new();
 
         for directory in directories {
-            let directory: String = directory.trim().to_string().replace("\\","/");
+            let directory: String = directory.trim().to_string().replace("\\", "/");
 
             if directory == "" {
                 continue;
@@ -105,7 +105,7 @@ impl Directories {
                 continue;
             }
             #[cfg(target_family = "windows")]
-            if !(directory[..directory.len()].starts_with(":/") || !directory[..directory.len()].starts_with(":\\"))  {
+            if !(directory[..directory.len()].starts_with(":/") || !directory[..directory.len()].starts_with(":\\")) {
                 text_messages.warnings.push("Excluded Directory Warning: Relative path are not supported, ignoring ".to_string() + directory.as_str());
                 continue;
             }
@@ -132,6 +132,13 @@ impl Directories {
 
         let mut optimized_included: Vec<String> = Vec::<String>::new();
         let mut optimized_excluded: Vec<String> = Vec::<String>::new();
+
+        // Windows(or specific EXT4 extension) doesn't recognize size of letters so we must remove one of directory e.g. - C:/h.txt, C:/H.txt
+        #[cfg(target_family = "windows")]
+        {
+            self.included_directories = self.included_directories.iter().map(Common::prettier_windows_path).collect();
+            self.excluded_directories = self.excluded_directories.iter().map(Common::prettier_windows_path).collect();
+        }
 
         // Remove duplicated entries like: "/", "/"
 

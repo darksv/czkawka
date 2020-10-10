@@ -143,6 +143,10 @@ impl EmptyFolder {
             }
             self.information.number_of_checked_folders += 1;
             current_folder = folders_to_check.pop().unwrap();
+            #[cfg(target_family = "windows")]
+            {
+                current_folder = Common::prettier_windows_path(&current_folder);
+            }
             // Checked folder may be deleted or we may not have permissions to open it so we assume that this folder is not be empty
             let read_dir = match fs::read_dir(&current_folder) {
                 Ok(t) => t,

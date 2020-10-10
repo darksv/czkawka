@@ -114,6 +114,10 @@ impl BigFile {
                 return false;
             }
             current_folder = folders_to_check.pop().unwrap();
+            #[cfg(target_family = "windows")]
+            {
+                current_folder = Common::prettier_windows_path(&current_folder);
+            }
 
             let read_dir = match fs::read_dir(&current_folder) {
                 Ok(t) => t,
