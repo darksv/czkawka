@@ -265,7 +265,7 @@ impl DuplicateFinder {
                     // Checking files
                     if metadata.len() >= self.minimal_file_size {
                         #[allow(unused_mut)] // Used is later by Windows build
-                        let current_file_name = "".to_owned()
+                        let mut current_file_name = "".to_owned()
                             + &current_folder
                             + match &entry_data.file_name().into_string() {
                                 Ok(t) => t,
